@@ -37,10 +37,6 @@ func tyrannyhandler(w http.ResponseWriter, r *http.Request) {
 	s.pages["tyranny"].ExecuteTemplate(w, "layout", "")
 }
 
-func parseip(r *http.Request) string {
-	return r.Header.Get("x-forwarded-for")
-}
-
 func logaccess(logentry string) {
 	log.Println(logentry)
 
@@ -62,6 +58,10 @@ func logaccess(logentry string) {
 		log.Printf("error writing to file: %s", err)
 		return
 	}
+}
+
+func parseip(r *http.Request) string {
+	return r.Header.Get("x-forwarded-for")
 }
 
 func flogentry(resource, ip string) string {
