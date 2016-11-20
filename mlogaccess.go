@@ -32,6 +32,10 @@ func indexhandler(w http.ResponseWriter, r *http.Request) {
 	s.pages["index"].ExecuteTemplate(w, "layout", "")
 }
 
+func faviconhandler(w http.ResponseWriter, r *http.Request) {
+	/* empty handler handles the browser requesting favicon.ico, prevents duplicate log entries */
+}
+
 func tyrannyhandler(w http.ResponseWriter, r *http.Request) {
 	logaccess(flogentry("tyranny.html", parseip(r)))
 	s.pages["tyranny"].ExecuteTemplate(w, "layout", "")
@@ -60,10 +64,6 @@ func logaccess(logentry string) {
 	}
 }
 
-func parseip(r *http.Request) string {
-	return r.Header.Get("x-forwarded-for")
-}
-
 func flogentry(resource, ip string) string {
 	return fmt.Sprintf(
 		"[ %s requested %s ]",
@@ -72,10 +72,15 @@ func flogentry(resource, ip string) string {
 	)
 }
 
+func parseip(r *http.Request) string {
+	return r.Header.Get("x-forwarded-for")
+}
+
 func main() {
 	log.Println("logging access...")
 
 	http.HandleFunc("/", indexhandler)
+	http.HandleFunc("/favicon.ico", faviconhandler)
 	http.HandleFunc("/tyranny", tyrannyhandler)
 
 	log.Fatal(http.ListenAndServe("127.0.0.1:8080", nil))
