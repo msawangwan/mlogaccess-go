@@ -1,2 +1,4 @@
+# ignore binaries
+bin/
 # ignore log file
 accesslog
