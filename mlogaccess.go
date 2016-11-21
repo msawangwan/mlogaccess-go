@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/msawangwan/mgeoloc"
 	"html/template"
 	"log"
 	"net/http"
@@ -25,10 +26,14 @@ func init() {
 
 	s.pages["index"] = template.Must(template.ParseFiles("./template/layout.html", "./template/index.html"))
 	s.pages["tyranny"] = template.Must(template.ParseFiles("./template/layout.html", "./template/tyranny.html"))
+
+	http.HandleFunc("/", indexhandler)
+	http.HandleFunc("/favicon.ico", faviconhandler)
+	http.HandleFunc("/tyranny", tyrannyhandler)
 }
 
 func indexhandler(w http.ResponseWriter, r *http.Request) {
-	logaccess(flogentry("index.html", parseip(r)))
+	logaccess(fnewlogentry("index.html", parseip(r)))
 	s.pages["index"].ExecuteTemplate(w, "layout", "")
 }
 
@@ -37,7 +42,7 @@ func faviconhandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func tyrannyhandler(w http.ResponseWriter, r *http.Request) {
-	logaccess(flogentry("tyranny.html", parseip(r)))
+	logaccess(fnewlogentry("tyranny.html", parseip(r)))
 	s.pages["tyranny"].ExecuteTemplate(w, "layout", "")
 }
 
@@ -64,24 +69,20 @@ func logaccess(logentry string) {
 	}
 }
 
-func flogentry(resource, ip string) string {
+func fnewlogentry(resource, ip string) string {
+	data := mgeoloc.FromAddr(ip)
 	return fmt.Sprintf(
-		"[ %s requested %s ]",
-		ip,
+		": served %s\n%s",
 		resource,
+		data.FormatData(),
 	)
 }
 
 func parseip(r *http.Request) string {
-	return r.Header.Get("x-forwarded-for")
+	return r.Header.Get("x-forwarded-for") // change if not using a reverse proxy
 }
 
 func main() {
 	log.Println("logging access...")
-
-	http.HandleFunc("/", indexhandler)
-	http.HandleFunc("/favicon.ico", faviconhandler)
-	http.HandleFunc("/tyranny", tyrannyhandler)
-
 	log.Fatal(http.ListenAndServe("127.0.0.1:8080", nil))
 }
