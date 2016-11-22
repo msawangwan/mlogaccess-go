@@ -1,6 +1,7 @@
 # ignore binaries
 bin/
 # ignore log file
+access.log
 accesslog
 # ignore swap files
 *.swp

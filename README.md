@@ -11,3 +11,12 @@ logs to console and a file:
 - static content requested
 
 * * *
+
+## task
+
+todo...
+
+- fix the template engine
+- serve static files on a goroutine
+
+* * *
